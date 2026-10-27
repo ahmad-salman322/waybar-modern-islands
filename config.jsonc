@@ -1,0 +1,200 @@
+// Modern Islands — waybar config for Hyprland
+// workspaces | weather · clock · date | system status
+{
+	"layer": "top",
+	"position": "top",
+	"height": 38,
+	"spacing": 4,
+	"reload_style_on_change": true,
+
+	"modules-left": [
+		"hyprland/workspaces"
+	],
+
+	"modules-center": [
+		"custom/weather",
+		"clock",
+		"custom/date",
+		"custom/media"
+	],
+
+	"modules-right": [
+		"cpu",
+		"memory",
+		"temperature",
+		"bluetooth",
+		"network",
+		"backlight",
+		"hyprland/language",
+		"pulseaudio",
+		"battery",
+		"custom/notifications",
+		"custom/power",
+		"custom/hijri-sync"
+	],
+
+	"hyprland/workspaces": {
+		"all-outputs": true,
+		"format": "{icon}",
+		"on-click": "activate",
+		"on-scroll-up": "hyprctl dispatch workspace e+1",
+		"on-scroll-down": "hyprctl dispatch workspace e-1",
+		"persistent-workspaces": {
+			"*": 10
+		},
+		"format-icons": {
+			"active": "",
+			"default": "",
+			"empty": ""
+		}
+	},
+
+	"custom/weather": {
+		"exec": "$HOME/.config/waybar/scripts/weather.py",
+		"return-type": "json",
+		"interval": 1800
+	},
+
+	"clock": {
+		"interval": 60,
+		"format": "{:%H:%M}",
+		"format-alt": "{:L%A %d %B}",
+		"tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+	},
+
+	// click: calendar popup · right click: Hijri / Gregorian
+	"custom/date": {
+		"exec": "$HOME/.config/waybar/scripts/date_chip.py",
+		"return-type": "json",
+		"interval": 60,
+		"signal": 9,
+		"format": "{}",
+		"on-click": "$HOME/.config/waybar/scripts/calendar_popup.py",
+		"on-click-right": "$HOME/.config/waybar/scripts/date_chip.py toggle"
+	},
+
+	// invisible: keeps the Hijri date in line with moon sighting (see scripts/hijri_sync.py)
+	"custom/hijri-sync": {
+		"exec": "$HOME/.config/waybar/scripts/hijri_sync.py",
+		"interval": 1800,
+		"tooltip": false
+	},
+
+	"custom/media": {
+		"format": "{}",
+		"return-type": "json",
+		"max-length": 25,
+		"exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} - {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+		"on-click": "playerctl play-pause",
+		"on-click-right": "playerctl next",
+		"on-click-middle": "playerctl previous"
+	},
+
+	"cpu": {
+		"interval": 5,
+		"format": " {usage}%",
+		"on-click-right": "kitty -e btop"
+	},
+
+	"memory": {
+		"interval": 10,
+		"format": "󰘚 {used:0.1f}G",
+		"tooltip-format": "{used:0.1f}GB/{total:0.1f}G",
+		"on-click-right": "kitty -e btop"
+	},
+
+	"temperature": {
+		"interval": 10,
+		"critical-threshold": 82,
+		"format": " {temperatureC}°"
+	},
+
+	"bluetooth": {
+		"format": "",
+		"format-disabled": "󰂲",
+		"format-off": "󰂲",
+		"format-connected": "󰂱 {num_connections}",
+		"tooltip-format": "{controller_alias} {status}",
+		"tooltip-format-connected": "{device_enumerate}",
+		"tooltip-format-enumerate-connected": "{device_alias} {device_battery_percentage}%",
+		"on-click": "blueman-manager"
+	},
+
+	"network": {
+		"format-wifi": "{icon}",
+		"format-ethernet": "󰈀",
+		"format-linked": "󰈁 No IP",
+		"format-disconnected": "󰤮",
+		"format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+		"tooltip-format-wifi": "{essid} {signalStrength}%\n{ipaddr}",
+		"tooltip-format-ethernet": "{ifname} {ipaddr}",
+		"tooltip-format-disconnected": "Disconnected",
+		"on-click": "nm-connection-editor",
+		"on-click-right": "kitty -e nmtui"
+	},
+
+	"backlight": {
+		"format": "{icon} {percent}%",
+		"format-icons": ["󰃞", "󰃟", "󰃠"],
+		"on-scroll-up": "brightnessctl set 5%+",
+		"on-scroll-down": "brightnessctl set 5%-"
+	},
+
+	"hyprland/language": {
+		"format": " {short}",
+		"on-click": "hyprctl switchxkblayout all next"
+	},
+
+	"pulseaudio": {
+		"format": "{icon} {volume}%",
+		"format-bluetooth": "{icon} 󰂯 {volume}%",
+		"format-muted": "󰝟",
+		"format-icons": {
+			"headphone": "",
+			"default": ["", "", ""]
+		},
+		"scroll-step": 5.0,
+		"on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+		"on-click-right": "pavucontrol",
+		"tooltip-format": "{desc} | {volume}%"
+	},
+
+	"battery": {
+		"states": {
+			"warning": 30,
+			"critical": 15
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "󰂄 {capacity}%",
+		"format-plugged": "󱘖 {capacity}%",
+		"format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+		"tooltip-format": "{timeTo} {power}w"
+	},
+
+	"custom/notifications": {
+		"format": "{icon}",
+		"format-icons": {
+			"notification": "<span foreground='#f27a8a'><sup></sup></span>",
+			"none": "",
+			"dnd-notification": "<span foreground='#f27a8a'><sup></sup></span>",
+			"dnd-none": "",
+			"inhibited-notification": "<span foreground='#f27a8a'><sup></sup></span>",
+			"inhibited-none": "",
+			"dnd-inhibited-notification": "<span foreground='#f27a8a'><sup></sup></span>",
+			"dnd-inhibited-none": ""
+		},
+		"return-type": "json",
+		"exec-if": "which swaync-client",
+		"exec": "swaync-client -swb",
+		"on-click": "sleep 0.1 && swaync-client -t -sw",
+		"on-click-right": "swaync-client -d -sw",
+		"tooltip-format": "Click: notifications\nRight click: do not disturb",
+		"escape": true
+	},
+
+	"custom/power": {
+		"format": "⏻",
+		"on-click": "wlogout",
+		"tooltip-format": "Power menu"
+	}
+}

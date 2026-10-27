@@ -1,0 +1,254 @@
+/* Modern Islands — glass chips waybar style */
+
+@define-color bg      rgba(17, 18, 28, 0.72);
+@define-color hover   rgba(255, 255, 255, 0.12);
+@define-color border  rgba(255, 255, 255, 0.08);
+@define-color text    #e6e8f2;
+@define-color dark    #11121c;
+@define-color muted   #8a93b8;
+
+@define-color violet  #b48cf9;
+@define-color indigo  #8b7cf6;
+@define-color blue    #6e9cf7;
+@define-color cyan    #5ec8f2;
+@define-color teal    #5ee0c8;
+@define-color green   #7ee0a1;
+@define-color yellow  #f5d76b;
+@define-color amber   #f5b86b;
+@define-color orange  #ff9e64;
+@define-color pink    #f58ac8;
+@define-color red     #f27a8a;
+
+* {
+	font-family: "JetBrainsMono Nerd Font";
+	font-weight: 600;
+	font-size: 97%;
+	min-height: 0;
+	border: none;
+}
+
+window#waybar {
+	background: transparent;
+	color: @text;
+}
+
+window#waybar.hidden {
+	opacity: 0.4;
+}
+
+tooltip {
+	background: rgba(17, 18, 28, 0.95);
+	border: 1px solid @border;
+	border-radius: 12px;
+	color: @text;
+}
+
+tooltip label {
+	padding: 4px 6px;
+}
+
+/*-----islands----*/
+/* black backdrop only behind the module groups, glued to the edges */
+.modules-left,
+.modules-center,
+.modules-right {
+	background: rgba(10, 10, 16, 0.85);
+	border: 1px solid @border;
+	border-radius: 16px;
+	padding: 3px 4px;
+}
+
+/*-----every module is a tinted chip----*/
+#cpu,
+#memory,
+#temperature,
+#custom-weather,
+#clock,
+#custom-date,
+#custom-media,
+#language,
+#bluetooth,
+#network,
+#pulseaudio,
+#backlight,
+#battery,
+#custom-notifications,
+#custom-power {
+	padding: 0 8px;
+	margin: 3px 2px;
+	border-radius: 10px;
+	transition: all 0.25s ease;
+}
+
+/*-----workspaces----*/
+#workspaces {
+	margin: 0 6px;
+	padding: 0 2px;
+	border-radius: 10px;
+	background: alpha(@indigo, 0.10);
+}
+
+#workspaces button {
+	color: @violet;
+	padding: 0 6px;
+	margin: 4px 2px;
+	border-radius: 9px;
+	background: transparent;
+	box-shadow: none;
+	text-shadow: none;
+	transition: all 0.3s cubic-bezier(.55, -0.68, .48, 1.68);
+}
+
+#workspaces button.empty {
+	color: alpha(@violet, 0.40);
+}
+
+#workspaces button.active {
+	color: @dark;
+	padding: 0 14px;
+	background: linear-gradient(90deg, @indigo, @cyan);
+}
+
+#workspaces button.urgent {
+	color: @dark;
+	background: @red;
+}
+
+#workspaces button:hover {
+	color: @text;
+	background: @hover;
+}
+
+#workspaces button.active:hover {
+	color: @dark;
+	background: linear-gradient(90deg, @cyan, @indigo);
+}
+
+/*-----system----*/
+#cpu         { color: @red;    background: alpha(@red, 0.14); }
+#memory      { color: @violet; background: alpha(@violet, 0.14); }
+#temperature { color: @orange; background: alpha(@orange, 0.14); }
+
+#temperature.critical {
+	color: @dark;
+	background: @red;
+}
+
+/*-----center----*/
+#custom-weather {
+	color: @cyan;
+	background: alpha(@cyan, 0.14);
+}
+
+#clock {
+	color: @dark;
+	font-weight: 800;
+	font-size: 104%;
+	letter-spacing: 1px;
+	padding: 0 14px;
+	background: linear-gradient(90deg, @indigo, @cyan);
+}
+
+#custom-date {
+	color: @violet;
+	background: alpha(@violet, 0.16);
+}
+
+#custom-date:hover {
+	color: @dark;
+	background: @violet;
+}
+
+#custom-media {
+	color: @green;
+	background: alpha(@green, 0.14);
+	font-weight: 500;
+}
+
+#custom-media.Paused {
+	color: @muted;
+	background: alpha(@muted, 0.12);
+}
+
+/*-----right: status----*/
+#language   { color: @violet; background: alpha(@violet, 0.14); }
+#bluetooth  { color: @blue;   background: alpha(@blue, 0.14); }
+#network    { color: @teal;   background: alpha(@teal, 0.14); }
+#pulseaudio { color: @green;  background: alpha(@green, 0.14); }
+#backlight  { color: @yellow; background: alpha(@yellow, 0.14); }
+#battery    { color: @green;  background: alpha(@green, 0.14); }
+
+#bluetooth.connected {
+	color: @dark;
+	background: @blue;
+}
+
+#bluetooth.off,
+#bluetooth.disabled {
+	color: @muted;
+	background: alpha(@muted, 0.12);
+}
+
+#network.disconnected {
+	color: @red;
+	background: alpha(@red, 0.14);
+}
+
+#pulseaudio.muted {
+	color: @muted;
+	background: alpha(@muted, 0.12);
+}
+
+#battery.charging,
+#battery.plugged {
+	color: @cyan;
+	background: alpha(@cyan, 0.14);
+}
+
+#battery.warning:not(.charging) {
+	color: @amber;
+	background: alpha(@amber, 0.14);
+}
+
+#battery.critical:not(.charging) {
+	color: @red;
+	background: alpha(@red, 0.14);
+	animation: blink 1s steps(12) infinite alternate;
+}
+
+#custom-notifications {
+	color: @orange;
+	background: alpha(@orange, 0.14);
+}
+
+#custom-power {
+	color: @red;
+	background: alpha(@red, 0.16);
+	margin-left: 4px;
+}
+
+#language:hover,
+#bluetooth:hover,
+#network:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#battery:hover,
+#custom-notifications:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#custom-weather:hover,
+#custom-media:hover {
+	background: @hover;
+}
+
+#custom-power:hover {
+	color: @dark;
+	background: @red;
+}
+
+@keyframes blink {
+	to {
+		background: alpha(@red, 0.35);
+	}
+}
