@@ -67,7 +67,7 @@ The Hijri conversion calls the system ICU library through `ctypes`, so no pip pa
 ## Install
 
 ```sh
-git clone https://github.com/USERNAME/waybar-modern-islands
+git clone https://github.com/ahmad-salman322/waybar-modern-islands
 cd waybar-modern-islands
 ./install.sh
 ```
