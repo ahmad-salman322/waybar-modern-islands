@@ -65,6 +65,7 @@ tooltip label {
 #custom-weather,
 #clock,
 #custom-date,
+#custom-prayer,
 #custom-media,
 #language,
 #bluetooth,
@@ -157,6 +158,21 @@ tooltip label {
 #custom-date:hover {
 	color: @dark;
 	background: @violet;
+}
+
+#custom-prayer {
+	color: @teal;
+	background: alpha(@teal, 0.14);
+}
+
+#custom-prayer.soon {
+	color: @dark;
+	background: @amber;
+}
+
+#custom-prayer.offline {
+	color: @muted;
+	background: alpha(@muted, 0.12);
 }
 
 #custom-media {

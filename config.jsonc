@@ -15,6 +15,7 @@
 		"custom/weather",
 		"clock",
 		"custom/date",
+		"custom/prayer",
 		"custom/media"
 	],
 
@@ -71,6 +72,17 @@
 		"format": "{}",
 		"on-click": "$HOME/.config/waybar/scripts/calendar_popup.py",
 		"on-click-right": "$HOME/.config/waybar/scripts/date_chip.py toggle"
+	},
+
+	// next prayer and time left (al-awail.com); hover for all times, click for the popup (city, summer/winter, time left or adhan time, language), right-click to refresh
+	"custom/prayer": {
+		"exec": "$HOME/.config/waybar/scripts/prayer_times.py",
+		"return-type": "json",
+		"interval": 30,
+		"signal": 10,
+		"format": "{}",
+		"on-click": "$HOME/.config/waybar/scripts/prayer_popup.py",
+		"on-click-right": "$HOME/.config/waybar/scripts/prayer_times.py refresh"
 	},
 
 	// invisible: keeps the Hijri date in line with moon sighting (see scripts/hijri_sync.py)
