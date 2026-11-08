@@ -170,6 +170,11 @@ tooltip label {
 	background: @amber;
 }
 
+#custom-prayer.iqama {
+	color: @dark;
+	background: @teal;
+}
+
 #custom-prayer.offline {
 	color: @muted;
 	background: alpha(@muted, 0.12);

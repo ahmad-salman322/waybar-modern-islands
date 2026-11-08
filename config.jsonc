@@ -74,7 +74,7 @@
 		"on-click-right": "$HOME/.config/waybar/scripts/date_chip.py toggle"
 	},
 
-	// next prayer and time left (al-awail.com); hover for all times, click for the popup (city, summer/winter, time left or adhan time, language), right-click to refresh
+	// next prayer and time left (al-awail.com); hover for all times, click for the popup (adhan and iqama times, city, summer/winter, time left or adhan time, language), right-click to refresh
 	"custom/prayer": {
 		"exec": "$HOME/.config/waybar/scripts/prayer_times.py",
 		"return-type": "json",

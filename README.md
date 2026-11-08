@@ -43,9 +43,9 @@ A colorful, glassy [Waybar](https://github.com/Alexays/Waybar) setup for Hyprlan
   <img src="screenshots/prayer-ar.png" width="340" alt="Prayer times popup in Arabic">
 </p>
 
-**The chip** shows the next prayer and how long is left, for example `Asr in 1h 12m` (in Arabic `العصر بعد 1س 12د`), or the adhan time instead, for example `Asr 14:22`. In the last 15 minutes it turns amber. Hover over it to see all of today's times, click it to open the prayer popup, and right-click to refresh.
+**The chip** shows the next prayer and how long is left, for example `Asr in 1h 12m` (in Arabic `العصر بعد 1س 12د`), or the adhan time instead, for example `Asr 14:22`. In the last 15 minutes it turns amber. After the adhan, until the iqama, it turns teal and counts down to the iqama instead, for example `Iqama Asr in 8m` (in Arabic `إقامة العصر بعد 8د`). Hover over it to see all of today's times, click it to open the prayer popup, and right-click to refresh.
 
-**The popup** shows your place as *City - Country* (for example `Amman - Jordan`), and today's times: prayers that have passed are dimmed, and the next one is highlighted with a countdown. The last lines show how the place was chosen, the place again, and where the times come from. Changes to the settings below show up at once, in the popup and on the bar, without closing the popup. It also has:
+**The popup** shows your place as *City - Country* (for example `Amman - Jordan`), and today's adhan and iqama times: prayers that have passed are dimmed, the next adhan is highlighted with a countdown, and between an adhan and its iqama that prayer is highlighted in amber with a countdown to the iqama. By default the iqama is 30 minutes after the adhan for Fajr, 15 for Dhuhr and Asr, and 10 for Maghrib and Isha (see `iqama` below). The last lines show how the place was chosen, the place again, and where the times come from. Changes to the settings below show up at once, in the popup and on the bar, without closing the popup. It also has:
 
 - **Change city:** type the name of your city in Arabic or English and pick it from the list (places are searched on [OpenStreetMap](https://nominatim.openstreetmap.org)). The Arabic and English names of the city are both saved, so the city and the country are always shown in the same language. Cities with officially approved times are listed first and marked **approved times**. The times download right away. **Automatic** under the search goes back to finding your location from your IP address.
 - **Auto / Summer / Winter:** *Auto* follows your system clock, so the times move by an hour when the clocks change. *Summer* and *Winter* force one or the other, like the buttons on the Al-Awail website. This helps when your clock and your local summer time don't change on the same day.
@@ -75,6 +75,7 @@ The popup saves its settings in `~/.config/prayer-times.json`. You can also edit
 ```json
 {"city": "Nablus", "latitude": 32.2211, "longitude": 35.2544,
  "lang": "ar", "chip": "left", "dst": "auto", "method": 2, "hanafi": false,
+ "iqama": {"Fajr": 30, "Dhuhr": 15, "Asr": 15, "Maghrib": 10, "Isha": 10},
  "offsets": {"Fajr": -2, "Isha": 3}}
 ```
 
@@ -87,6 +88,7 @@ The popup saves its settings in `~/.config/prayer-times.json`. You can also edit
 | `dst` | `"auto"`, `"summer"` or `"winter"` |
 | `method` | calculator method: `0` Karachi, `1` ISNA, `2` Muslim World League (default), `3` Umm al-Qura, `4` Egyptian, `5` Diyanet |
 | `hanafi` | `true` uses the Hanafi Asr time |
+| `iqama` | minutes from the adhan to the iqama, per prayer (the values above are the default) |
 | `offsets` | minutes added to single prayers, to match your mosque exactly |
 
 From a terminal: `scripts/prayer_times.py show` prints today's times, `refresh` downloads again, and `lang` switches the language.

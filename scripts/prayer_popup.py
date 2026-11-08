@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Prayer times popup for the Modern Islands waybar, opened by clicking the prayer chip.
-# Shows today's times (from al-awail.com, see prayer_times.py), and has:
+# Shows today's adhan and iqama times (from al-awail.com, see prayer_times.py), and has:
 #   - "Change city": type a city in Arabic or English and pick it from the list
 #   - Auto / Summer / Winter: follow the system clock or force summer or winter time
 #   - Time left / Prayer time: what the chip shows next to the prayer name
@@ -34,6 +34,11 @@ CSS = """
 .next { background: rgba(94, 224, 200, 0.16); }
 .next .pname, .next .ptime { color: #5ee0c8; }
 .left { color: #5ee0c8; font-size: 11px; font-weight: 700; }
+.iqtime { color: #8a93b8; font-weight: 700; font-size: 12px; }
+.phead { padding: 0 10px; }
+.wait { background: rgba(245, 184, 107, 0.16); }
+.wait .pname, .wait .ptime, .wait .iqtime, .wait .left { color: #f5b86b; }
+.next .iqtime { color: #5ee0c8; }
 .teal-btn { background: rgba(94, 224, 200, 0.14); color: #5ee0c8; }
 .teal-btn:hover { background: #5ee0c8; color: #11121c; }
 .seg { background: rgba(255, 255, 255, 0.04); border-radius: 10px; padding: 2px; }
@@ -162,14 +167,18 @@ class PrayerPopup(pb.PopupWindow):
         else:
             upcoming = [(n, t) for n, t in today if n in pt.PRAYERS and t > now]
             nxt = upcoming[0] if upcoming else None
+            wait = pt.waiting_iqama(today, now)
+            self.times.append(self.header_row())
             for name, t in today:
-                self.times.append(self.time_row(pt.pname(name), t, now, (name, t) == nxt))
+                state = ("wait" if wait and name == wait[0] else
+                         "next" if (name, t) == nxt else None)
+                self.times.append(self.time_row(pt.pname(name), t, pt.iqama_time(name, t), now, state))
             if not nxt:
                 tomorrow = pt.day_times(loc, now.date() + timedelta(days=1), tz) or []
                 fajr = next(((n, t) for n, t in tomorrow if n == "Fajr"), None)
                 if fajr:
-                    self.times.append(self.time_row(T("tomorrow").format(pt.pname("Fajr")),
-                                                    fajr[1], now, True))
+                    self.times.append(self.time_row(T("tomorrow").format(pt.pname("Fajr")), fajr[1],
+                                                    pt.iqama_time("Fajr", fajr[1]), now, "next"))
         pt.SOURCE = source
         how = T("loc_config") if loc.get("source") == "config" else T("loc_ip")
         origin = pt.origin_text() if source == "approved" else f"{pt.origin_text()}\n{pt.method_text()}"
@@ -182,16 +191,30 @@ class PrayerPopup(pb.PopupWindow):
                 self.city.append(pb.label("-", "city"))
             self.city.append(pb.label(part, "city"))
 
-    def time_row(self, name, t, now, is_next):
+    def header_row(self):
+        row = Gtk.Box(spacing=8)
+        row.add_css_class("phead")
+        row.append(pb.label("", hexpand=True))
+        row.append(pb.label(pt.tr("adhan"), "muted", width_chars=6))
+        row.append(pb.label(pt.tr("iqama"), "muted", width_chars=6))
+        return row
+
+    def time_row(self, name, t, iq, now, state):
+        """state: "next" (next adhan), "wait" (adhan called, iqama not yet) or None."""
         row = Gtk.Box(spacing=8)
         row.add_css_class("prow")
         row.append(pb.label(name, "pname", xalign=0, hexpand=True))
-        if is_next:
+        if state == "next":
             row.add_css_class("next")
             row.append(pb.label(pt.tr("in").format(pt.fmt_left(t - now)), "left"))
-        elif t <= now:
+        elif state == "wait":
+            row.add_css_class("wait")
+            row.append(pb.label(pt.tr("iqama_of").format("") + pt.tr("in").format(pt.fmt_left(iq - now)),
+                                "left"))
+        elif (iq or t) <= now:
             row.add_css_class("past")
-        row.append(pb.label(f"{t:%H:%M}", "ptime"))
+        row.append(pb.label(f"{t:%H:%M}", "ptime", width_chars=6))
+        row.append(pb.label(f"{iq:%H:%M}" if iq else "", "iqtime", width_chars=6))
         return row
 
     # ----- settings -----

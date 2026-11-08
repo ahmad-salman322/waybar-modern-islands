@@ -15,7 +15,8 @@ so you can choose your city in the popup (click the chip), or edit ~/.config/pra
 
 Every key is optional. With latitude and longitude set, IP detection is off.
 "lang": "ar" shows everything in Arabic. "chip": "time" shows the adhan time on
-the bar instead of the time left. "dst": "summer" or "winter" forces the
+the bar instead of the time left. "iqama" sets the minutes from adhan to iqama,
+e.g. {"Fajr": 30, "Dhuhr": 15, "Asr": 15, "Maghrib": 10, "Isha": 10} (the default). "dst": "summer" or "winter" forces the
 time instead of following the system clock (the popup has buttons for both).
 "offsets" adds minutes to single prayers, to match your mosque or the Al-Awail app.
 Methods (as on al-awail.com): 0 Karachi, 1 ISNA, 2 Muslim World League,
@@ -73,6 +74,7 @@ TEXT = {
         "location": "Location {}: {}", "time": "Time",
         "dst": {"auto": "Auto", "summer": "Summer", "winter": "Winter"},
         "lang_btn": "عربي",
+        "adhan": "Adhan", "iqama": "Iqama", "iqama_of": "Iqama {}",
         "show": "On the bar", "show_opts": {"left": "Time left", "time": "Prayer time"},
         "countries": {"PS": "Palestine"},
         "src": {"approved": "Officially approved times (Al-Awail)",
@@ -103,6 +105,7 @@ TEXT = {
         "location": "الموقع {}: {}", "time": "التوقيت",
         "dst": {"auto": "تلقائي", "summer": "صيفي", "winter": "شتوي"},
         "lang_btn": "English",
+        "adhan": "الأذان", "iqama": "الإقامة", "iqama_of": "إقامة {}",
         "show": "على الشريط", "show_opts": {"left": "الوقت المتبقي", "time": "وقت الأذان"},
         "countries": {"PS": "فلسطين", "TR": "تركيا"},   # TR: iso-codes renamed it, the translation lags
         "src": {"approved": "مواعيد معتمدة رسمياً (الأوائل)",
@@ -338,6 +341,36 @@ def offsets():
         except (TypeError, ValueError):
             pass
     return out
+
+
+# minutes from the adhan to the iqama; "iqama" in the config changes single prayers
+IQAMA = {"Fajr": 30, "Dhuhr": 15, "Asr": 15, "Maghrib": 10, "Isha": 10}
+
+
+def iqama_minutes():
+    raw = (read_json(CONFIG, {}) or {}).get("iqama", {})
+    out = dict(IQAMA)
+    for name in IQAMA:
+        try:
+            out[name] = int(raw.get(name, out[name]))
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
+def iqama_time(name, adhan):
+    """When the iqama is for a prayer (None for sunrise)."""
+    mins = iqama_minutes().get(name)
+    return adhan + timedelta(minutes=mins) if mins is not None else None
+
+
+def waiting_iqama(today, now):
+    """(name, iqama time) when the adhan has been called and the iqama hasn't, else None."""
+    for name, t in today:
+        iq = iqama_time(name, t)
+        if iq and t <= now < iq:
+            return name, iq
+    return None
 
 
 def year_file(loc, year):
@@ -632,17 +665,24 @@ def chip(force=False):
         nxt = next(((n, t) for n, t in tomorrow if n == "Fajr"), None)
         day_times(loc, now.date(), tz)      # SOURCE describes today again
 
+    wait = waiting_iqama(today, now)
     width = max(len(pname(n)) for n in NAMES) + 1
-    lines = [f"<b>{ICON}  {tr('title')} · {place_text(loc)}</b>", ""]
+    lines = [f"<b>{ICON}  {tr('title')} · {place_text(loc)}</b>", "",
+             f"<tt><span foreground='#8a93b8'>{'':<{width}} {tr('adhan'):<6} {tr('iqama')}</span></tt>"]
     for name, t in today:
-        row = f"{pname(name):<{width}} {t:%H:%M}"
-        if nxt and (name, t) == nxt:
+        iq = iqama_time(name, t)
+        row = f"{pname(name):<{width}} {t:%H:%M}  {f'{iq:%H:%M}' if iq else '':<5}"
+        if wait and name == wait[0]:
+            row = (f"<span foreground='#f5b86b'><b>{row}  ← "
+                   f"{tr('iqama_of').format('')}{tr('in').format(fmt_left(wait[1] - now))}</b></span>")
+        elif nxt and (name, t) == nxt:
             row = f"<span foreground='#7ee0a1'><b>{row}  ← {tr('in').format(fmt_left(nxt[1] - now))}</b></span>"
-        elif t <= now:
+        elif (iq or t) <= now:
             row = f"<span foreground='#8a93b8'>{row}</span>"
         lines.append(f"<tt>{row}</tt>")
     if nxt and nxt[1].date() != now.date():
-        lines.append(f"<tt><span foreground='#7ee0a1'><b>{pname('Fajr'):<{width}} {nxt[1]:%H:%M}  ← "
+        iq = iqama_time("Fajr", nxt[1])
+        lines.append(f"<tt><span foreground='#7ee0a1'><b>{pname('Fajr'):<{width}} {nxt[1]:%H:%M}  {iq:%H:%M}  ← "
                      f"{tr('tomorrow_in').format(fmt_left(nxt[1] - now))}</b></span></tt>")
     how = tr("loc_config") if loc.get("source") == "config" else tr("loc_ip")
     origin = origin_text() if SOURCE == "approved" else f"{origin_text()}\n{method_text()}"
@@ -652,6 +692,11 @@ def chip(force=False):
 
     if not nxt:
         return {"text": ICON, "tooltip": "\n".join(lines), "class": "offline"}
+    if wait:   # between the adhan and the iqama: count down to the iqama
+        label = tr("iqama_of").format(pname(wait[0]))
+        when = f"{wait[1]:%H:%M}" if chip_mode() == "time" else tr("in").format(fmt_left(wait[1] - now))
+        return {"text": f"{ICON} {label} {when}", "tooltip": "\n".join(lines), "class": "iqama",
+                "alt": wait[0]}
     left = nxt[1] - now
     cls = "soon" if left <= timedelta(minutes=SOON) else "normal"
     if chip_mode() == "time":
