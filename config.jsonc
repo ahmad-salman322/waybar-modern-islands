@@ -154,6 +154,7 @@
 
 	"hyprland/language": {
 		"format": " {short}",
+		"min-length": 4,
 		"on-click": "hyprctl switchxkblayout all next"
 	},
 
