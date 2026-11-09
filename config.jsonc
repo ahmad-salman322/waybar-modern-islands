@@ -53,7 +53,8 @@
 	"custom/weather": {
 		"exec": "$HOME/.config/waybar/scripts/weather.py",
 		"return-type": "json",
-		"interval": 1800
+		"interval": 1800,
+		"signal": 11
 	},
 
 	"clock": {

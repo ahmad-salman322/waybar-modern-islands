@@ -16,6 +16,7 @@ A colorful, glassy [Waybar](https://github.com/Alexays/Waybar) setup for Hyprlan
 
 - **Workspaces:** 10 dots. The active one stretches into a violet-to-cyan pill, filled dots have windows, and rings are empty. Scroll to move between workspaces.
 - **Center:** weather, the clock, a date chip, the next prayer with the time left, and the current media (artist and title, click to play or pause).
+- **Weather:** temperature and conditions from [wttr.in](https://wttr.in), refreshed every 30 minutes. If there is no internet when the bar starts (for example right after login, before Wi-Fi connects), it refreshes by itself as soon as the connection is back, instead of showing `--` until the next update.
 - **Right side:** CPU, memory, temperature, Bluetooth, network, brightness, keyboard layout, volume, battery, notifications, and power. Each one has its own color.
 
 ### Date chip and calendar popup
