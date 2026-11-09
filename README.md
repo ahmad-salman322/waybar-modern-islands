@@ -60,6 +60,14 @@ A colorful, glassy [Waybar](https://github.com/Alexays/Waybar) setup for Hyprlan
 | Al-Awail calculator | the website's calculator; your city has no approved times page |
 | Calculated on this computer | al-awail.com isn't answering, so the times are calculated locally |
 
+**Hold a shortcut to peek (optional):** the same popup can show in the middle of the screen only while a key combination is held, and hide as soon as you let go. To appear instantly, `prayer_peek.py` keeps the window ready in the background, and the shortcut only tells it to show or hide (a few milliseconds). For Hyprland, add to your config:
+
+```
+exec-once = ~/.config/waybar/scripts/prayer_peek.py
+bind = SUPER SHIFT, P, exec, ~/.config/waybar/scripts/prayer_peek.sh show
+bindr = SUPER SHIFT, P, exec, ~/.config/waybar/scripts/prayer_peek.sh hide
+```
+
 #### Where the times come from
 
 - **Al-Awail:** the times come from [Al-Awail](https://al-awail.com), the company behind the prayer clocks in many mosques. Its website has no API, so the script reads the same pages a browser would.

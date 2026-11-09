@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Shared plumbing for the Modern Islands waybar popups (prayer_popup.py).
+# Shared plumbing for the Modern Islands waybar popups (prayer_popup.py, prayer_peek.py).
 # Importing it toggles the popup named after the running script (a second click closes
 # it), closes the other bar popups, and re-execs with gtk4-layer-shell preloaded, all
 # before GTK loads. Then build a PopupWindow subclass and hand it to run().
@@ -39,7 +39,15 @@ def running_pid(name):
 def _prepare():
     global _name
     script = os.path.basename(sys.argv[0])
-    _name = next(n for n, word in POPUPS.items() if script.startswith(word))
+    _name = next((n for n, word in POPUPS.items() if script.startswith(word)), None)
+    if _name is None:
+        # a helper outside the click-to-toggle group (e.g. prayer_peek.py): it isn't
+        # toggled or closed by the others, it only needs gtk4-layer-shell preloaded
+        _name = os.path.splitext(script)[0].lower()
+        if LIB not in os.environ.get("LD_PRELOAD", "") and os.path.exists(LIB):
+            os.environ["LD_PRELOAD"] = LIB
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        return
     name = _name
     if LIB not in os.environ.get("LD_PRELOAD", ""):
         pid = running_pid(name)

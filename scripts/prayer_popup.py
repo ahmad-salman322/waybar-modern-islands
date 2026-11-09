@@ -5,6 +5,8 @@
 #   - Auto / Summer / Winter: follow the system clock or force summer or winter time
 #   - Time left / Prayer time: what the chip shows next to the prayer name
 #   - Arabic / English: the language of the popup, the chip and its tooltip
+#
+# prayer_peek.py shows the same window in the middle of the screen while a shortcut is held.
 
 import os
 import sys
@@ -348,4 +350,5 @@ def clear(box):
         child = nxt
 
 
-pb.run(PrayerPopup, CSS)
+if __name__ == "__main__":
+    pb.run(PrayerPopup, CSS)

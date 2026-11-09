@@ -15,8 +15,8 @@ fi
 
 mkdir -p "$DEST/scripts"
 cp "$SRC/config.jsonc" "$SRC/style.css" "$DEST/"
-cp "$SRC"/scripts/*.py "$DEST/scripts/"
-chmod +x "$DEST"/scripts/*.py
+cp "$SRC"/scripts/*.py "$SRC"/scripts/*.sh "$DEST/scripts/"
+chmod +x "$DEST"/scripts/*.py "$DEST"/scripts/*.sh
 
 if pgrep -x waybar >/dev/null; then
     pkill -x waybar
