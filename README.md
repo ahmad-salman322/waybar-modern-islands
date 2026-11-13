@@ -166,7 +166,7 @@ scripts/calendar_popup.py  the calendar popup
 scripts/hijri.py           Gregorian <-> Hijri conversion, with sighting corrections
 scripts/hijri_sync.py      the moon-sighting check
 scripts/weather.py         weather from wttr.in
-scripts/waybar_peek.py     optional: show the bar only while Super is held
+scripts/waybar_peek.py     optional: show the bar only while Super is held (Super+\ pins it)
 ```
 
 Sighting data is saved to `~/.cache/hijri-sync.json`, and the date chip mode to `~/.cache/datechip-mode`.
@@ -200,6 +200,14 @@ Optional. The bar stays hidden and appears only while you hold the Super key, pu
    ```
 
 To make the bar float over your windows instead of pushing them down, also add `"exclusive": false,`.
+
+**Keep it on screen:** press **Super+\\** to pin the bar so it stays visible all the time. Press **Super+\\** again to go back to showing it only while Super is held. The choice is saved in `~/.cache/waybar-pinned`, so it stays the same after a restart.
+
+The script reads the key directly, so no bind is needed. To stop the `\` from also being typed into the focused window, add an empty bind to `hyprland.conf`:
+
+```
+bind = SUPER, backslash, exec, true
+```
 
 ## Privacy
 

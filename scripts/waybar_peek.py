@@ -3,9 +3,12 @@
 # Shows on Super press, hides on release. Reads the keyboards straight from evdev
 # (your user must be in the "input" group); nothing is grabbed, so Super still works
 # for your binds. Works with keyd too (its virtual keyboard is picked up).
+# Super+\ pins the bar on (press again to unpin); the choice is kept in
+# ~/.cache/waybar-pinned, so it survives a restart.
 # Needs "start_hidden": true in config.jsonc. See "Show the bar only while Super is
 # held" in the README.
 import json
+import os
 import re
 import select
 import struct
@@ -13,6 +16,8 @@ import subprocess
 import time
 
 SUPER = {125, 126}          # KEY_LEFTMETA, KEY_RIGHTMETA
+KEY_BACKSLASH = 43          # Super+\ pins the bar on / off
+PINFILE = os.path.expanduser("~/.cache/waybar-pinned")   # exists = pinned (survives restart)
 EV_KEY = 1
 EVENT = struct.Struct("llHHi")
 HOLD_DELAY = 0              # seconds Super must be held before the bar shows
@@ -78,7 +83,9 @@ def main():
     held = False
     shown = False
     show_at = None
-    set_bar(False)
+    pinned = os.path.exists(PINFILE)
+    set_bar(pinned)
+    shown = pinned
     while True:
         for real in keyboards():
             if real not in files.values():
@@ -88,7 +95,7 @@ def main():
                     pass
         timeout = max(0.0, show_at - time.monotonic()) if show_at else 5
         ready, _, _ = select.select(list(files), [], [], timeout)
-        if not ready and not held:
+        if not ready and not held and not pinned:
             fix_stale_reserve()
         for fh in ready:
             try:
@@ -101,21 +108,32 @@ def main():
                 continue
             for off in range(0, len(data) - EVENT.size + 1, EVENT.size):
                 _s, _us, typ, code, value = EVENT.unpack_from(data, off)
-                if typ != EV_KEY or code not in SUPER or value == 2:
+                if typ != EV_KEY or value == 2:
+                    continue
+                if code == KEY_BACKSLASH and value == 1 and held:
+                    pinned = not pinned
+                    try:
+                        if pinned:
+                            open(PINFILE, "w").close()
+                        else:
+                            os.remove(PINFILE)
+                    except OSError:
+                        pass
+                    continue
+                if code not in SUPER:
                     continue
                 if value == 1 and not held:
                     held = True
                     show_at = time.monotonic() + HOLD_DELAY
                 elif value == 0 and held:
                     held, show_at = False, None
-                    if shown:
+                    if shown and not pinned:
                         set_bar(False)
                         shown = False
         if held and show_at and time.monotonic() >= show_at:
             show_at = None
             set_bar(True)
             shown = True
-
 
 if __name__ == "__main__":
     main()
