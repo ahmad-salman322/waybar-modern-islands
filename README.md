@@ -15,7 +15,7 @@ A colorful, glassy [Waybar](https://github.com/Alexays/Waybar) setup for Hyprlan
 ### The bar
 
 - **Workspaces:** 10 dots. The active one stretches into a violet-to-cyan pill, filled dots have windows, and rings are empty. Scroll to move between workspaces.
-- **Center:** weather, the clock, a date chip, the next prayer with the time left, and the current media (artist and title, click to play or pause).
+- **Center:** the next prayer with the time left, the clock (kept in the middle of the screen), a date chip, the weather, and the current media (artist and title, click to play or pause).
 - **Weather:** temperature and conditions from [wttr.in](https://wttr.in), refreshed every 30 minutes. If there is no internet when the bar starts (for example right after login, before Wi-Fi connects), it refreshes by itself as soon as the connection is back, instead of showing `--` until the next update.
 - **Right side:** CPU, memory, temperature, Bluetooth, network, brightness, keyboard layout, volume, battery, notifications, and power. Each one has its own color.
 
@@ -166,6 +166,7 @@ scripts/calendar_popup.py  the calendar popup
 scripts/hijri.py           Gregorian <-> Hijri conversion, with sighting corrections
 scripts/hijri_sync.py      the moon-sighting check
 scripts/weather.py         weather from wttr.in
+scripts/waybar_peek.py     optional: show the bar only while Super is held
 ```
 
 Sighting data is saved to `~/.cache/hijri-sync.json`, and the date chip mode to `~/.cache/datechip-mode`.
@@ -183,6 +184,22 @@ Sighting data is saved to `~/.cache/hijri-sync.json`, and the date chip mode to 
 - **Colors:** all colors are `@define-color` variables at the top of `style.css`.
 - **Terminal:** `kitty` is used for `btop` and `nmtui`. Change it in `config.jsonc` if you use another terminal.
 - **Floating islands:** to add a gap from the screen edges, add `"margin-top": 6, "margin-left": 10, "margin-right": 10` to `config.jsonc`.
+
+### Show the bar only while Super is held
+
+Optional. The bar stays hidden and appears only while you hold the Super key, pushing your windows down like a normal bar. It hides again as soon as you let go.
+
+1. Add `"start_hidden": true,` to `config.jsonc`, below `"layer": "top",`.
+2. Make sure your user is in the `input` group (the script reads the keyboard directly; log out and back in after this):
+   ```sh
+   sudo usermod -aG input "$USER"
+   ```
+3. Start the script from `hyprland.conf`:
+   ```
+   exec-once = ~/.config/waybar/scripts/waybar_peek.py
+   ```
+
+To make the bar float over your windows instead of pushing them down, also add `"exclusive": false,`.
 
 ## Privacy
 

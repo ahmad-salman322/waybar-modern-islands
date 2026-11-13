@@ -1,5 +1,5 @@
 // Modern Islands — waybar config for Hyprland
-// workspaces | weather · clock · date | system status
+// workspaces | prayer · clock · date · weather | system status
 {
 	"layer": "top",
 	"position": "top",
@@ -12,10 +12,10 @@
 	],
 
 	"modules-center": [
-		"custom/weather",
+		"custom/prayer",
 		"clock",
 		"custom/date",
-		"custom/prayer",
+		"custom/weather",
 		"custom/media"
 	],
 

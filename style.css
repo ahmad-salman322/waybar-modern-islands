@@ -163,6 +163,7 @@ tooltip label {
 #custom-prayer {
 	color: @teal;
 	background: alpha(@teal, 0.14);
+	min-width: 160px;   /* balances date + weather so the clock sits mid-screen */
 }
 
 #custom-prayer.soon {
